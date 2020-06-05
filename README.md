@@ -3,15 +3,6 @@
 GNU Make and VIM based micro IDE for the C programming language featuing simple commands to realize a simple terminal-only edit-compile-test development cycle. Linux-only (tested on Ubunutu 18.04). 
 
 
-## Overview
-
-1. make project: Set-up folder structure for new project 
-2. make module: Add source and header file templates for new module 
-3. make ide: Open all project files as buffers in Vim (plus split plus fullscreen)
-4. make check: Compile module and unit test source files and run unit tests
-5. make run: Compile module source files and run main
-
-
 ## Dependencies
 
 Depends on VIM, exuberant ctags, and build-essentials which can be installed as follows (under Debian/Ubuntu):
@@ -20,6 +11,17 @@ sudo apt-get install vim
 sudo apt-get install build-essential
 sudo apt-get install exuberant-ctags
 ```
+
+
+## Commands
+
+1. make project: Set-up folder structure for new project 
+2. make module: Add source and header file templates for new module 
+3. make ide: Open all project files as buffers in Vim (plus split plus fullscreen)
+4. make check: Compile module and unit test source files and run unit tests
+5. make run: Compile module source files and run main
+
+
 	
 ### make project
 
@@ -58,11 +60,28 @@ project/
 
 ### make ide
 
-Project files can be edited via `make ide` which will start Vim and open all project related source and header files.
+Project files can be edited via `make ide`. This will open all project related source and header files in Vim. Additionally, this will set the following options (which can be found in the `makefile`):
 
-### make
+```bash
+vim -c "set list nu et sta sts=2 ts=2 sw=2 tag | vsp | args **/*.c **/*.h <CR>"
+```
 
-As usual, `make` will compile all (updated) project sources.
+In particular, this will set tabstops and indentation to 2 spaces, as well as start Vim in fullscreen and vertical split mode. Change as you see fit, however I suggest moving more extensive personalizations to a `vimrc` file. An interactive Vim tutorial can be found [here](https://www.openvim.com/).
+
+Note that this also runs exuberant ctags via  `ctags -R .` which will create a `TAGS` file in the project root directory. To update the tags database from inside Vim use `:!ctags -R .` from the Vim command line. Some basic commands are:
+
+
+| **Vim command** | **Action** |
+|:-:|:-:|
+| Ctrl-]  | Jump to tag under cursor  |
+| :ts <tag> <RET>  | Search for <tag>  |
+| :ts  | List all definitions of last tag |
+| :tn  | Go to the next/previous tag definition  |
+| Ctrl-t  | Jump up the tag stack (go back) |
+
+### make run
+
+Compile project sources and execute main with time measurement, i.e. `make && time ./main`.
 
 ### make check
 
@@ -91,7 +110,15 @@ int main(void)
 }
 ```
 
-where further unit test functions can be added via `check_run(void(*f)(void))` and assertions testet via `check_assert(bool)`.
+where test functions like `test_feature` can be added via
+```C
+`check_run(void(*f)(void))`
+```
+
+and assertions testet via
+```C
+`check_assert(bool)`.
+```
 
 
 
