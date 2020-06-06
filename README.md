@@ -1,11 +1,11 @@
 # make-ide
 
-GNU Make and VIM based micro IDE for the C programming language featuing simple commands to realize a simple terminal-only edit-compile-test development cycle. Linux-only (tested on Ubunutu 18.04). 
+GNU Make and Vim based micro IDE for the C programming language. Open project files, add module templates, compile sources, and run unit tests with a single command. Tested on Ubunutu 18.04.
 
 
 ## Dependencies
 
-Depends on VIM, exuberant ctags, and build-essentials which can be installed as follows (under Debian/Ubuntu):
+Depends on Vim, Exuberant Ctags, and GCC, which can be installed as follows (under Debian/Ubuntu):
 ```bash
 sudo apt-get install vim
 sudo apt-get install build-essential
