@@ -17,18 +17,8 @@ CFLAGS += -Wno-unused-result -Wno-unused-value -Wno-unused-function
 CFLAGS += -Iincl -I/usr/local/lib
 LDLIBS += -lm -pthread
 
-CFLAGS += $(shell pkg-config --cflags libcurl)
-CFLAGS += $(shell pkg-config --cflags libpq)
-CFLAGS += $(shell pkg-config --cflags json-c)
-CFLAGS += $(shell pkg-config --cflags nlopt)
-
-LDLIBS += $(shell pkg-config --libs blas)
-LDLIBS += $(shell pkg-config --libs lapack)
-LDLIBS += $(shell pkg-config --libs lapacke)
-LDLIBS += $(shell pkg-config --libs libcurl)
-LDLIBS += $(shell pkg-config --libs libpq)
-LDLIBS += $(shell pkg-config --libs json-c)
-LDLIBS += $(shell pkg-config --libs nlopt)
+#CFLAGS += $(shell pkg-config --cflags libcurl)
+#LDLIBS += $(shell pkg-config --libs libcurl)
 
 ifeq ($(DEBUG),true)
 CFLAGS := -g3 -O0 $(filter-out -O3,$(CFLAGS))
