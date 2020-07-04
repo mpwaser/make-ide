@@ -1,6 +1,6 @@
 # make-ide
 
-GNU Make and Vim based micro IDE for the C programming language. Open project files, add module templates, compile sources, and run unit tests with a single command. Tested on Ubuntu 18.04.
+GNU Make and Vim based micro IDE for the C programming language. Open project files, add module templates, compile and debug sources, run unit tests - all with a single make command. Tested on Ubuntu 18.04.
 
 
 ## Dependencies
@@ -12,6 +12,10 @@ sudo apt-get install build-essential
 sudo apt-get install exuberant-ctags
 ```
 
+
+## Getting started
+
+Put the makefile into an empty folder e.g. `project/` and type `make project` which will initialize a new project. Type `make module NAME=foo` to add source, header and unit test templates for your new foo module. Thereafter, type `make ide` to open all project sources in Vim and start coding. Use `make run` and/or `make debug` to test and debug your code (to debug unit tests run `make debug TEST=foo`). Use `make check` to run all unit tests. If they pass, add some more modules and code some more and have a happy day. Rinse and repeat.
 
 ## Commands
 
