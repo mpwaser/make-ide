@@ -9,24 +9,44 @@ OBJ   := $(BUILD)/obj
 SOURCES := $(patsubst src/%.c,%,$(wildcard src/*.c))
 TESTS   := $(patsubst test/%.c,%,$(wildcard test/*.c))
 
-CFLAGS += -g3 -O0 -std=gnu11 -pedantic -Wall -Iincl
-CFLAGS += -march=native -fdata-sections -ffunction-sections
+CFLAGS += -std=gnu11
+CFLAGS += -O3 -march=native -fdata-sections -ffunction-sections
+CFLAGS += -Wall -Wextra -Wpedantic
+CFLAGS += -Wno-unused-result -Wno-unused-value -Wno-unused-function
+
+CFLAGS += -Iincl -I/usr/local/lib
 LDLIBS += -lm -pthread
 
 CFLAGS += $(shell pkg-config --cflags libcurl)
+CFLAGS += $(shell pkg-config --cflags libpq)
+CFLAGS += $(shell pkg-config --cflags json-c)
+CFLAGS += $(shell pkg-config --cflags nlopt)
+
+LDLIBS += $(shell pkg-config --libs blas)
+LDLIBS += $(shell pkg-config --libs lapack)
+LDLIBS += $(shell pkg-config --libs lapacke)
 LDLIBS += $(shell pkg-config --libs libcurl)
+LDLIBS += $(shell pkg-config --libs libpq)
+LDLIBS += $(shell pkg-config --libs json-c)
+LDLIBS += $(shell pkg-config --libs nlopt)
+
+ifeq ($(DEBUG),true)
+CFLAGS := -g3 -O0 $(filter-out -O3,$(CFLAGS))
+endif
 
 NAME := module
 NAME_UPPER  = $(shell echo $(NAME) | tr a-z A-Z)
 
+TEST := main
+DEBUG := false
 
-main: $(SOURCES:%=$(OBJ)/%.o)
+main: $(SOURCES:%=$(OBJ)/%.o) ## Compile main
 	$(CC) $^ $(CFLAGS) -MMD $(LDLIBS) -o $@
 
 $(OBJ)/%.o: src/%.c | $(OBJ)
 	$(CC) -c $(CFLAGS) -MMD -MT $@ -MF $(OBJ)/$*.d $< -o $@
 
-check: $(TESTS:%=$(BIN)/%) 
+check: $(TESTS:%=$(BIN)/%)  ## Run all unit tests
 	@for name in $^; do ./$$name; done
 
 $(BIN)/%: $(OBJ)/%.o $(filter-out $(OBJ)/main.o,$(SOURCES:%=$(OBJ)/%.o)) | $(BIN)
@@ -38,17 +58,24 @@ $(OBJ)/%.o: test/%.c | $(OBJ)
 $(BIN) $(OBJ):
 	@mkdir -p $@
 
-clean:
+clean: ## Remove build folder
 	rm -rf build
 
-run:
-	make -s && make ./main
+run: ## Compile main and run executable
+	make main -s && make ./main
 
-ide:
+debug: ## Debug main or module unit test, e.g. make debug TEST=foo
+ifeq ($(TEST),main)
+	make main DEBUG=true && gdb ./$(TEST)
+else
+	make check DEBUG=true && gdb ./build/bin/test_$(TEST)
+endif
+
+ide: ## Open all project related files in Vim
 	ctags -R . && vim -c "set list nu et sta sts=2 ts=2 sw=2 tag \
 	       	| vsp | args **/*.c **/*.h <CR> "
 
-module:
+module: ## Create templates for new modules, e.g. make module NAME=foo
 
 	@printf '%s\n' '#include <stdlib.h>' '' '#include "$(NAME).h"' '' ''     \
 		'void' 'function(void)' '{' '' '}' >> src/$(NAME).c
@@ -61,14 +88,18 @@ module:
 		'  check_run(test_feature);' '  exit(EXIT_SUCCESS);' '}'         \
 		>> test/test_$(NAME).c
 
-project: 
+project:  ## Set up folder structure for new project in empty root folder
 	@mkdir -p test src incl
 	$(file > check.h,$(CHECK))
 	@mv check.h incl/check.h
 	@printf '%s\n' '#include <stdlib.h>' '' '' 'int main(void)' \
 		'{' '' '}' >> src/main.c
 
-.PHONY: run ide module project
+help: 
+	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
+		| sed -n 's/^\(.*\): \(.*\)##\(.*\)/\1\t\3/p'
+
+.PHONY: ide module project
 
 
 define CHECK = 

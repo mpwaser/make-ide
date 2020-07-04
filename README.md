@@ -15,15 +15,18 @@ sudo apt-get install exuberant-ctags
 
 ## Commands
 
-1. `make project`: Set-up folder structure for new project 
-2. `make module`: Add source and header file templates for new module 
-3. `make ide`: Open all project files as buffers in Vim (plus split plus fullscreen)
-4. `make check`: Compile module and unit test source files and run unit tests
-5. `make run`: Compile module source files and run main
-
+0. `make`:		 Compile module source files
+1. `make project`:	 Set-up folder structure for new project (run in empty folder)
+2. `make module`:	 Add source and header file templates for new module, e.g. make module NAME=foo
+3. `make ide`:		 Open all project files as buffers in Vim (plus split plus fullscreen)
+4. `make check`:	 Compile module and unit test source files and run unit tests
+5. `make run`:		 Compile module source files and run main
+6. `make clean`:	 Remove build folder (needed before switching between make run/debug)
+7. `make debug`:	 Debug project or unit test sources, e.g. make debug TEST=foo
+8. `make help`:		 List available commands and short descriptions thereof
 
 	
-### make project
+### (1) make project
 
 To start a new project, place the `makefile` into an empty folder e.g. `project/` and type `make project` into the terminal console. This will set up the following folder structure:
 
@@ -37,9 +40,10 @@ project/
 └── test/
 ```
 
-where `check.h` contains a micro, header-only unit testing framework (see **make check** section).
+where `check.h` contains a tiny header-only unit testing framework (see **make check** section).
 
-### make module
+
+### (2) make module
 
 To add a module e.g. foo, type `make module NAME=foo` from within the project folder. This will add three new template files to the project. One for the module source, one for the header file, and one for the unit test source:
 
@@ -59,7 +63,8 @@ project/
 
 Note that this will overwrite existing files if a new module is added with the same name. 
 
-### make ide
+
+### (3) make ide
 
 To start editing project files, type `make ide` into the console. This will open all project related source and header files in Vim with some basic Vim settings, analogue to the following command:
 
@@ -80,11 +85,8 @@ Note that this also runs Exuberant Ctags via  `ctags -R .`, creating a `TAGS` fi
 | :tn  | Go to the next/previous tag definition  |
 | Ctrl-t  | Jump up the tag stack (go back) |
 
-### make run
 
-Typing `make run` into the console will compile all project sources and run the executable generated from `main.c`.
-
-### make check
+### (4) make check
 
 Unit tests can be compiled and ran using the `make check` command. Note that `make module` will automatically add the following template, e.g. for `test/test_foo.c`:
 
@@ -121,4 +123,22 @@ and assertions testet via
 check_assert(bool);
 ```
 
-Note that purposely, boolean assertions are the only means for testing.
+
+### (5) make run
+
+Typing `make run` into the console will compile all project sources and run the executable generated from `main.c`.
+
+
+### (6) make clean
+
+Remove build folder, equal to command line `rm -rf build`.
+
+
+### (7) make debug
+
+Debug main or test sources with GDB by running `make debug` or `make debug TEST=foo`.
+
+
+### (8) make help
+
+List available commands and short descriptions thereof.
