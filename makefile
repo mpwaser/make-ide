@@ -36,8 +36,12 @@ main: $(SOURCES:%=$(OBJ)/%.o) ## Compile main
 $(OBJ)/%.o: src/%.c | $(OBJ)
 	$(CC) -c $(CFLAGS) -MMD -MT $@ -MF $(OBJ)/$*.d $< -o $@
 
-check: $(TESTS:%=$(BIN)/%)  ## Run all unit tests
+check: $(TESTS:%=$(BIN)/%)  ## Run all or specifi unit tests, e.g. make check TEST=foo
+ifeq ($(TEST),main)
 	@for name in $^; do ./$$name; done
+else
+	./build/bin/test_$(TEST)
+endif
 
 $(BIN)/%: $(OBJ)/%.o $(filter-out $(OBJ)/main.o,$(SOURCES:%=$(OBJ)/%.o)) | $(BIN)
 	@$(CC) $^ $(CFLAGS) -MMD $(LDLIBS) -o $@
@@ -52,7 +56,7 @@ clean: ## Remove build folder
 	rm -rf build
 
 run: ## Compile main and run executable
-	make main -s && make ./main
+	make main -s && ./main
 
 debug: ## Debug main or module unit test, e.g. make debug TEST=foo
 ifeq ($(TEST),main)
