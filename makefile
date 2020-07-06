@@ -52,7 +52,7 @@ clean: ## Remove build folder
 	rm -rf build
 
 run: ## Compile main and run executable
-	make main -s && make ./main
+	make main -s && ./main
 
 debug: ## Debug main or module unit test, e.g. make debug TEST=foo
 ifeq ($(TEST),main)
