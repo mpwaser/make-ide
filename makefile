@@ -20,15 +20,26 @@ LDLIBS += -lm -pthread
 #CFLAGS += $(shell pkg-config --cflags libcurl)
 #LDLIBS += $(shell pkg-config --libs libcurl)
 
+
+###BEGIN-UPDATE
+
+UPDATE  := 'https://raw.githubusercontent.com/mpwaser/make-ide/master/makefile'
+VERSION := 'v0.1.0'
+
 ifeq ($(DEBUG),true)
 CFLAGS := -g3 -O0 $(filter-out -O3,$(CFLAGS))
 endif
 
-NAME := module
+ifeq ($(PROFILE),true)
+CFLAGS := -pg -g3 -O0 $(filter-out -O3,$(CFLAGS))
+endif
+
+NAME := foo
 NAME_UPPER  = $(shell echo $(NAME) | tr a-z A-Z)
 
-TEST := main
-DEBUG := false
+TEST    := main
+DEBUG   := false
+PROFILE := false
 
 main: $(SOURCES:%=$(OBJ)/%.o) ## Compile main
 	$(CC) $^ $(CFLAGS) -MMD $(LDLIBS) -o $@
@@ -37,10 +48,14 @@ $(OBJ)/%.o: src/%.c | $(OBJ)
 	$(CC) -c $(CFLAGS) -MMD -MT $@ -MF $(OBJ)/$*.d $< -o $@
 
 check: $(TESTS:%=$(BIN)/%)  ## Run all or specifi unit tests, e.g. make check TEST=foo
+ifneq ($(PROFILE),true)
+ifneq ($(DEBUG),true)
 ifeq ($(TEST),main)
-	@for name in $^; do ./$$name; done
+	@for name in $^; do ./$$name || exit; done
 else
 	./build/bin/test_$(TEST)
+endif
+endif
 endif
 
 $(BIN)/%: $(OBJ)/%.o $(filter-out $(OBJ)/main.o,$(SOURCES:%=$(OBJ)/%.o)) | $(BIN)
@@ -55,9 +70,22 @@ $(BIN) $(OBJ):
 clean: ## Remove build folder
 	rm -rf build
 
+.PHONY: run
 run: ## Compile main and run executable
 	make main -s && ./main
 
+.PHONY: profile
+profile: ## Generate main or unit test profiling information, e.g. make profile TEST=foo
+ifneq ($(TEST),main)
+	@make check PROFILE=true TEST=$(TEST) && ./build/bin/test_$(TEST)
+	@gprof build/bin/test_$(TEST) gmon.out > PROFILE && rm gmon.out
+	@cat PROFILE
+else
+	@make check PROFILE=true && ./main
+	@gprof ./main gmon.out > PROFILE && rm gmon.out && cat PROFILE
+endif
+
+.PHONY: debug
 debug: ## Debug main or module unit test, e.g. make debug TEST=foo
 ifeq ($(TEST),main)
 	make main DEBUG=true && gdb ./$(TEST)
@@ -65,10 +93,12 @@ else
 	make check DEBUG=true && gdb ./build/bin/test_$(TEST)
 endif
 
+.PHONY: ide
 ide: ## Open all project related files in Vim
 	ctags -R . && vim -c "set list nu et sta sts=2 ts=2 sw=2 tag \
 	       	| vsp | args **/*.c **/*.h <CR> "
 
+.PHONY: module
 module: ## Create templates for new modules, e.g. make module NAME=foo
 
 	@printf '%s\n' '#include <stdlib.h>' '' '#include "$(NAME).h"' '' ''     \
@@ -82,6 +112,7 @@ module: ## Create templates for new modules, e.g. make module NAME=foo
 		'  check_run(test_feature);' '  exit(EXIT_SUCCESS);' '}'         \
 		>> test/test_$(NAME).c
 
+.PHONY: project
 project:  ## Set up folder structure for new project in empty root folder
 	@mkdir -p test src incl
 	$(file > check.h,$(CHECK))
@@ -89,11 +120,18 @@ project:  ## Set up folder structure for new project in empty root folder
 	@printf '%s\n' '#include <stdlib.h>' '' '' 'int main(void)' \
 		'{' '' '}' >> src/main.c
 
-help: 
+.PHONY: update
+update:  ## Replace local makefile between UPDATE markers with repo content
+	@curl $(UPDATE) > update.txt
+	@sed -e "/'###BEGIN-UPDATE$$'/,/'###END-UPDATE$$'/{ /'###BEGIN-UPDATE$$'/{p;
+		r update }; /'###END-UPDATE$$'/p; d }" makefile
+	@rm update.txt && echo 'Update make-ide to $(VERSION)'
+
+
+.PHONY: help
+help:
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
 		| sed -n 's/^\(.*\): \(.*\)##\(.*\)/\1\t\3/p'
-
-.PHONY: ide module project
 
 
 define CHECK = 
@@ -210,16 +248,17 @@ check__run(const char* file, int line, const char* fname, void(*fn)(void))
     fn();
     fprintf(stderr, "%s", ci->num_failed > fails ? FAIL_DOT : PASS_DOT);
     fflush(stderr);
-    exit(EXIT_SUCCESS);
+    exit(ci->num_failed ? EXIT_FAILURE : EXIT_SUCCESS);
   }
   else
   {
     waitpid(pid, &stat, 0);
     check_error(file, line, fname, stat);
+    exit(EXIT_FAILURE);
   }
 }
 
 #endif
 endef
 
-
+###END-UPDATE

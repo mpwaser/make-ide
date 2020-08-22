@@ -5,11 +5,12 @@ GNU Make and Vim based micro IDE for the C programming language. Open project fi
 
 ## Dependencies
 
-Depends on Vim, Exuberant Ctags, and GCC. Install as follows under Ubuntu:
+Depends on Vim, Exuberant Ctags, Curl, and GCC. Install as follows under Ubuntu:
 ```bash
 sudo apt-get install vim
 sudo apt-get install build-essential
 sudo apt-get install exuberant-ctags
+sudo apt-get install curl
 ```
 
 
@@ -19,15 +20,17 @@ Put the makefile into an empty folder e.g. `project/` and type `make project` wh
 
 ## Commands
 
-0. `make`:		 Compile module source files
-1. `make project`:	 Set-up folder structure for new project (run in empty folder)
-2. `make module`:	 Add source and header file templates for new module, e.g. make module NAME=foo
-3. `make ide`:		 Open all project files as buffers in Vim (plus split plus fullscreen)
-4. `make check`:	 Compile module and unit test source files and run unit tests
-5. `make run`:		 Compile module source files and run main
-6. `make clean`:	 Remove build folder (needed before switching between make run/debug)
-7. `make debug`:	 Debug project or unit test sources, e.g. make debug TEST=foo
-8. `make help`:		 List available commands and short descriptions thereof
+0.  `make`:		Compile module source files
+1.  `make project`:	Set-up folder structure for new project (run in empty folder)
+2.  `make module`:	Add source and header file templates for new module, e.g. make module NAME=foo
+3.  `make ide`:		Open all project files as buffers in Vim (plus split plus fullscreen)
+4.  `make check`:	Compile module and unit test source files and run unit tests
+5.  `make run`:		Compile module source files and run main
+6.  `make clean`:	Remove build folder (needed before switching between make run/debug)
+7.  `make debug`:	Debug project or unit test sources, e.g. make debug TEST=foo
+8.  `make profile`:	Generate main or unit test profiling information, e.g. make profile TEST=foo
+9.  `make update`:	Replace local makefile between UPDATE markers with repo contents
+10. `make help`:	List available commands and short descriptions thereof
 
 	
 ### (1) make project
@@ -143,6 +146,15 @@ Remove build folder, equal to command line `rm -rf build`.
 Debug main or test sources with GDB by running `make debug` or `make debug TEST=foo`.
 
 
-### (8) make help
+### (8) make profile
+
+Generate profiling information in PROFILE text file by using the `gprof` utilty. Note that this has to compile and run the code before profiling infoformation can be created which might take some time. Use either on main or a module unit test via `make profile` or `make profile TEST=foo`.
+
+
+### (9) make update
+
+Replace the content of your local makefile between `###BEGIN-UPDATE` and `###END-UPDATE` with the latest `make-ide` repository makefile content between these markers.
+
+### (10) make help
 
 List available commands and short descriptions thereof.
