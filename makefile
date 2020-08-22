@@ -123,7 +123,7 @@ project:  ## Set up folder structure for new project in empty root folder
 update:  ## Replace local makefile between UPDATE markers with repo content
 	@curl -s $(UPDATE) > update
 	@sed -i '1,/^###BEGIN-UPDATE$$/d' update
-	@sed -i '/^###BEGIN-UPDATE$$/,$$d' makefile
+	@sed -i '1,/^###BEGIN-UPDATE$$/!d' makefile
 	@cat update >> makefile && rm update && echo 'Update make-ide to $(VERSION)'
 
 .PHONY: help
