@@ -81,7 +81,7 @@ ifneq ($(TEST),main)
 	@gprof build/bin/test_$(TEST) gmon.out > PROFILE && rm gmon.out
 	@cat PROFILE
 else
-	@make check PROFILE=true && ./main
+	@make PROFILE=true && ./main
 	@gprof ./main gmon.out > PROFILE && rm gmon.out && cat PROFILE
 endif
 
