@@ -20,7 +20,6 @@ LDLIBS += -lm -pthread
 #CFLAGS += $(shell pkg-config --cflags libcurl)
 #LDLIBS += $(shell pkg-config --libs libcurl)
 
-
 ###BEGIN-UPDATE
 
 UPDATE  := 'https://raw.githubusercontent.com/mpwaser/make-ide/master/makefile'
@@ -122,11 +121,10 @@ project:  ## Set up folder structure for new project in empty root folder
 
 .PHONY: update
 update:  ## Replace local makefile between UPDATE markers with repo content
-	@curl $(UPDATE) > update.txt
-	@sed -e "/'###BEGIN-UPDATE$$'/,/'###END-UPDATE$$'/{ /'###BEGIN-UPDATE$$'/{p;
-		r update }; /'###END-UPDATE$$'/p; d }" makefile
-	@rm update.txt && echo 'Update make-ide to $(VERSION)'
-
+	@curl -s $(UPDATE) > update
+	@sed -i '1,/^###BEGIN-UPDATE$$/d' update
+	@sed -i '/^###BEGIN-UPDATE$$/,$${n;d}' makefile
+	@cat update >> makefile && rm update && echo 'Update make-ide to $(VERSION)'
 
 .PHONY: help
 help:
@@ -260,5 +258,3 @@ check__run(const char* file, int line, const char* fname, void(*fn)(void))
 
 #endif
 endef
-
-###END-UPDATE
