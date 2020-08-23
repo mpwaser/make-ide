@@ -5,7 +5,7 @@ GNU Make and Vim based micro IDE for the C programming language. Open project fi
 
 ## Dependencies
 
-Depends on Vim, Exuberant Ctags, Curl, and GCC. Install as follows under Ubuntu:
+Depends on Vim, Ctags, Curl, and GCC. Install as follows under Ubuntu:
 ```bash
 sudo apt-get install vim
 sudo apt-get install build-essential
@@ -16,11 +16,13 @@ sudo apt-get install curl
 
 ## Getting started
 
-Put the makefile into an empty folder e.g. `project/` and type `make project` which will initialize a new project. Type `make module NAME=foo` to add source, header and unit test templates for your new foo module. Thereafter, type `make ide` to open all project sources in Vim and start coding. Use `make run` and/or `make debug` to test and debug your code (to debug unit tests run `make debug TEST=foo`). Use `make check` to run all unit tests. If they pass, add some more modules and code some more and have a happy day. Rinse and repeat.
+-  Put the makefile into an empty folder e.g. `project/`. Open a terminal window, navigate to this folder and type `make project`. This will initialize a new project including some folders and a main source file.
+-  Type `make module NAME=foo` to add source, header and unit test templates for a new module called "foo".
+-  Open a second terminal window (preferably on your second screen), navigate into your project folder and type `make ide`. This will open all project sources in Vim where you can now write the code for "main" and your "foo" module.
+-  In the first terminal window, type `make run` and/or `make debug` to run and/or debug your code. Note that you might need to clean the build folder via `make clean` before `make debug` which will recompile with debugging symbols (and vice versa if you want `make run` to compile without debugging symbols). Use `make check` to run all unit tests (to check a single module, run `make check TEST=foo`). If you want to debug a spedific unit test, type `make debug TEST=foo`.
 
-## Commands
+## Available commands
 
-0.  `make`:		Compile module source files
 1.  `make project`:	Set-up folder structure for new project (run in empty folder)
 2.  `make module`:	Add source and header file templates for new module, e.g. make module NAME=foo
 3.  `make ide`:		Open all project files as buffers in Vim (plus split plus fullscreen)
@@ -33,7 +35,7 @@ Put the makefile into an empty folder e.g. `project/` and type `make project` wh
 10. `make help`:	List available commands and short descriptions thereof
 
 	
-### (1) make project
+### 1. make project
 
 To start a new project, place the `makefile` into an empty folder e.g. `project/` and type `make project` into the terminal console. This will set up the following folder structure:
 
@@ -50,7 +52,7 @@ project/
 where `check.h` contains a tiny header-only unit testing framework (see **make check** section).
 
 
-### (2) make module
+### 2. make module
 
 To add a module e.g. foo, type `make module NAME=foo` from within the project folder. This will add three new template files to the project. One for the module source, one for the header file, and one for the unit test source:
 
@@ -71,7 +73,7 @@ project/
 Note that this will overwrite existing files if a new module is added with the same name. 
 
 
-### (3) make ide
+### 3. make ide
 
 To start editing project files, type `make ide` into the console. This will open all project related source and header files in Vim with some basic Vim settings, analogue to the following command:
 
@@ -93,7 +95,7 @@ Note that this also runs Exuberant Ctags via  `ctags -R .`, creating a `TAGS` fi
 | Ctrl-t  | Jump up the tag stack (go back) |
 
 
-### (4) make check
+### 4. make check
 
 Unit tests can be compiled and ran using the `make check` command. Note that `make module` will automatically add the following template, e.g. for `test/test_foo.c`:
 
@@ -131,30 +133,30 @@ check_assert(bool);
 ```
 
 
-### (5) make run
+### 5. make run
 
 Typing `make run` into the console will compile all project sources and run the executable generated from `main.c`.
 
 
-### (6) make clean
+### 6. make clean
 
 Remove build folder, equal to command line `rm -rf build`.
 
 
-### (7) make debug
+### 7. make debug
 
 Debug main or test sources with GDB by running `make debug` or `make debug TEST=foo`.
 
 
-### (8) make profile
+### 8. make profile
 
 Generate profiling information in PROFILE text file by using the `gprof` utilty. Note that this has to compile and run the code before profiling infoformation can be created which might take some time. Use either on main or a module unit test via `make profile` or `make profile TEST=foo`.
 
 
-### (9) make update
+### 9. make update
 
 Replace the content of your local makefile between `###BEGIN-UPDATE` and `###END-UPDATE` with the latest `make-ide` repository makefile content between these markers.
 
-### (10) make help
+### 10. make help
 
 List available commands and short descriptions thereof.
