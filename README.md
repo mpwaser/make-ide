@@ -31,7 +31,7 @@ sudo apt-get install curl
 6.  `make clean`:	Remove build folder (needed before switching between make run/debug)
 7.  `make debug`:	Debug project or unit test sources, e.g. make debug TEST=foo
 8.  `make profile`:	Generate main or unit test profiling information, e.g. make profile TEST=foo
-9.  `make update`:	Replace local makefile between UPDATE markers with repo contents
+9.  `make update`:	Replace local makefile after the ###BEGIN-UPDATE marker with repo contents
 10. `make help`:	List available commands and short descriptions thereof
 
 	
@@ -83,7 +83,7 @@ vim -c "set list nu et sta sts=2 ts=2 sw=2 tag | vsp | args **/*.c **/*.h <CR>"
 
 In particular, this will add line numbering, use spaces as tabstops, set indentation to 2 spaces and start Vim in fullscreen and vertical split mode. Change as you see fit. However I suggest moving more extensive personalizations to a `vimrc` file. An interactive Vim tutorial can be found [here](https://www.openvim.com/).
 
-Note that this also runs Exuberant Ctags via  `ctags -R .`, creating a `TAGS` file in the project root directory. To update the tags database from inside Vim use `:!ctags -R .` from the Vim command line. Some basic Vim Ctags commands are:
+Note that this also runs Exuberant Ctags via  `ctags -R .`, creating a `tags` file in the project root directory. To update the tags database from inside Vim use `:!ctags -R .` from the Vim command line. Some basic Vim Ctags commands are:
 
 
 | **Vim command** | **Action** |
@@ -145,7 +145,7 @@ Remove build folder, equal to command line `rm -rf build`.
 
 ### 7. make debug
 
-Debug main or test sources with GDB by running `make debug` or `make debug TEST=foo`.
+Debug main or test sources with `gdb` by running `make debug` or `make debug TEST=foo`.
 
 
 ### 8. make profile
@@ -155,7 +155,7 @@ Generate profiling information in PROFILE text file by using the `gprof` utilty.
 
 ### 9. make update
 
-Replace the content of your local makefile between `###BEGIN-UPDATE` and `###END-UPDATE` with the latest `make-ide` repository makefile content between these markers.
+Replace the content of your local makefile after `###BEGIN-UPDATE` with the latest `make-ide` repository makefile content after this marker. This only has an effect if there were changes in the master branch of this respository, i.e. when a new version was released.
 
 ### 10. make help
 
